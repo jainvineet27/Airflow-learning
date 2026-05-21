@@ -27,40 +27,47 @@ def start_number(**context):
         Task XCom me "current_value" naam ke key ke andar number variable ki value push kar raha hai.
         Baad me koi dusra task isko xcom_pull() se nikaal sakta hai.
           ''')
+    print('''
+        a python_callable me function dena hota hai,
+           kyunki operator us function ko run karega.
+          ''')
     
 def add_five(**context):
-    current_value = context['ti'].xcom_pull(key='current_value')
+    current_value = context['ti'].xcom_pull(key='current_value', task_ids ="start_task")
     new_value = current_value + 5
     context['ti'].xcom_push(key='current_value', value=new_value)
 
 
 def multiply_by_two(**context):
-    current_value = context['ti'].xcom_pull(key='current_value')
+    current_value = context['ti'].xcom_pull(key='current_value', task_ids ="add_five_task")
     new_value = current_value *2
     context['ti'].xcom_push(key="current_value",value =new_value)
 
 
 def substract_three(**context):
-    current_value = context["ti"].xcom_pull(key="current_value")
+    current_value = context["ti"].xcom_pull(key="current_value", task_ids="multiply_by_two_task")
     new_value= current_value - 3 if current_value >=3  else  0
+    print(f"Printing substract_three >>>>>>>>>> {new_value}")
     context["ti"].xcom_push(key="current_value",value=new_value)
 
 
 def square_result(**context):
-    current_value =context["ti"].xcom_pull(key="current_value")
+    current_value =context["ti"].xcom_pull(key="current_value", task_ids="substract_task")
     new_value = current_value ** 2
     context["ti"].xcom_push(key="current_value",value=new_value)
+    print(f"Square of the result >>>>>>> {new_value}")
 
 with DAG(
-   name =  'math_operations',
-   start_date=datetime(2026,5,1),
-    schedule_interval='@daily'
+   name =  'vineet_math_operations',
+   start_date=datetime(2026,5,20),
+    schedule_interval='@once'
 ) as dag:
     
-    start = PythonOperator(task_id="start_task", python=callable=start_number)
-    add = PythonOperator(task_id="add_five_task", python_callable=add_five)
-    multiply = PythonOperator(task_id="multiply_by_two_task", python_callable=multiply_by_two)
-    square=  PythonOperator(task_id ="square_task", python_callable=square_result)
+    start = PythonOperator(task_id="start_task", python=callable=start_number , provide_context=True)
+    add = PythonOperator(task_id="add_five_task", python_callable=add_five, provide_context=True)
+    multiply = PythonOperator(task_id="multiply_by_two_task", python_callable=multiply_by_two, provide_context=True)
+    substract = PythonOperator(task_id="substract_task", python_callable=substract_three, provide_context=True)
+    square=  PythonOperator(task_id ="square_task", python_callable=square_result, provide_context=True)
                             
 
     start >> add >> multiply >> substract >> square
