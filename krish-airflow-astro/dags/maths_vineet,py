@@ -1,0 +1,66 @@
+'''
+start with a initial number 
+add 5 to it 
+multiply the result by 2
+subtract 3 from the result
+compute the square of the result 
+'''
+
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+import os
+import json 
+import random
+
+#Define the function for each taks 
+
+
+def start_number(**context):
+    pass
+    number = random.randint(1, 200)
+    print(f"number is {number}")
+    context['ti'].xcom_push(key='current_value', value=number)
+    print("context['ti'] → Airflow ka TaskInstance object")
+    print(''' 
+        Matlab:  
+        Task XCom me "current_value" naam ke key ke andar number variable ki value push kar raha hai.
+        Baad me koi dusra task isko xcom_pull() se nikaal sakta hai.
+          ''')
+    
+def add_five(**context):
+    current_value = context['ti'].xcom_pull(key='current_value')
+    new_value = current_value + 5
+    context['ti'].xcom_push(key='current_value', value=new_value)
+
+
+def multiply_by_two(**context):
+    current_value = context['ti'].xcom_pull(key='current_value')
+    new_value = current_value *2
+    context['ti'].xcom_push(key="current_value",value =new_value)
+
+
+def substract_three(**context):
+    current_value = context["ti"].xcom_pull(key="current_value")
+    new_value= current_value - 3 if current_value >=3  else  0
+    context["ti"].xcom_push(key="current_value",value=new_value)
+
+
+def square_result(**context):
+    current_value =context["ti"].xcom_pull(key="current_value")
+    new_value = current_value ** 2
+    context["ti"].xcom_push(key="current_value",value=new_value)
+
+with DAG(
+   name =  'math_operations',
+   start_date=datetime(2026,5,1),
+    schedule_interval='@daily'
+) as dag:
+    
+    start = PythonOperator(task_id="start_task", python=callable=start_number)
+    add = PythonOperator(task_id="add_five_task", python_callable=add_five)
+    multiply = PythonOperator(task_id="multiply_by_two_task", python_callable=multiply_by_two)
+    square=  PythonOperator(task_id ="square_task", python_callable=square_result)
+                            
+
+    start >> add >> multiply >> substract >> square
