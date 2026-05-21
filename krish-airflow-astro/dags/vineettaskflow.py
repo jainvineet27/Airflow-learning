@@ -14,9 +14,9 @@ PythonOperator( task_id ='' , python_callable , context=True )
 
 '''
 
-with DAG ( name ='vineet_api_flow' , start_date = datetime.now() , 
+with DAG ( dag_id ='vineet_api_flow' , start_date = datetime(2026,5,20),
           schedule_interval ='@once', 
-          catch=False) as dag:
+            catchup=False) as dag:
   
    @task
    def start_number():

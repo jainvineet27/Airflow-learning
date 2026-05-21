@@ -58,7 +58,7 @@ def square_result(**context):
     print(f"Square of the result >>>>>>> {new_value}")
 
 with DAG(
-   name =  'vineet_math_operations',
+   dag_id =  'vineet_math_operations',
    start_date=datetime(2026,5,20),
     schedule_interval='@once'
 ) as dag:
