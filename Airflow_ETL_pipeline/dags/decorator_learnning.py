@@ -18,18 +18,20 @@ def mydecorator(func):
     def _(*args, **kwargs) ->int :
         print('This is my decorator')
         print("start time ", datetime.now())        
-        func(*args)
+        #func(*args)
         print("end time ", datetime.now())
+        c=  func(*args)
+        print(c)
         
     return _
 
 @mydecorator
-def load_table(table_name, schema_name , catalog_name):
+def load_table(table_name :str, schema_name :str , catalog_name :str) -> str:
     print('Loading data into the table ...',table_name )
-    print()
-    return table_name
+    return  ('>>>>>>>>>>>>>>>>>>').join([table_name, schema_name, catalog_name])
 
 def procesS_table():
-    pass
+     print('What should be position of a decorato to handle this code...')
+     a=1/0
 
 load_table('orders','dbo','vineetdb')

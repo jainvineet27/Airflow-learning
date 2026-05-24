@@ -7,12 +7,12 @@ import os
 # Load .env file
 load_dotenv()
 
-API_KEY = os.getenv("API_KEY")
+NASA_API_KEY = os.getenv("NASA_API_KEY")
 
-url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}"
+url = f"https://api.nasa.gov/planetary/apod?api_key={NASA_API_KEY}"
 
 response = requests.get(url)
 data = response.json()
 for key, value in data.items():
-    print(f"{key}")
+    print(f"{key}: {value}")
 
